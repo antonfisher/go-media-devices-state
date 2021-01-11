@@ -3,7 +3,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/antonfisher/go-media-devices-state)](https://goreportcard.com/report/github.com/antonfisher/go-media-devices-state)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
 
-Go module to get camera/microphone state (checks if camera or microphone is ON).
+Go module to get camera/microphone state, checks if camera/microphone is ON.
 
 Module uses `cgo` to call native specific API on different platforms (currently only darwin is implemented.)
 
@@ -37,20 +37,20 @@ func main() {
 
 ## Supported platforms
 
-| Platform | Supported |
-|----------|-----------|
-| darwin   | YES       |
-| linux    | NOT YET   |
-| windows  | NOT YET   |
+| Platform | Supported | Details                                |
+|----------|-----------|----------------------------------------|
+| darwin   | **YES**   | Using `CoreMediaIO/CMIOHardware.h` API |
+| linux    | NOT YET   |                                        |
+| windows  | NOT YET   |                                        |
 
 ## Troubleshooting
 
-Get list of cameras registered in the system:
+Get list of registered cameras:
 ```shell
 // macOS
 system_profiler SPCameraDataType
 ```
 
-# License
+## License
 
 MIT License.
