@@ -15,8 +15,11 @@ go get github.com/antonfisher/go-media-devices-state
 
 ## Demo
 
+Demo prints out all system video devices and their states (On/Off):
+
 ```shell
 git clone https://github.com/antonfisher/go-media-devices-state.git
+cd go-media-devices-state
 go run -a cmd/demo.go
 ```
 
@@ -35,13 +38,13 @@ func main() {
 }
 ```
 
-## Supported platforms
+## Implemented APIs
 
-| Platform | Supported | Details                                |
-|----------|-----------|----------------------------------------|
-| darwin   | **YES**   | Using `CoreMediaIO/CMIOHardware.h` API |
-| linux    | NOT YET   |                                        |
-| windows  | NOT YET   |                                        |
+| Platform | `IsCameraOn()` | `IsMicOn()` | Details                                |
+|----------|:--------------:|:-----------:|----------------------------------------|
+| darwin   |       ☑        |      ☐      | Using `CoreMediaIO/CMIOHardware.h` API |
+| linux    |       ☐        |      ☐      |                                        |
+| windows  |       ☐        |      ☐      |                                        |
 
 ## Troubleshooting
 
