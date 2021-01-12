@@ -1,4 +1,4 @@
-package main
+package mediadevicesstate
 
 import (
 	"github.com/antonfisher/go-media-devices-state/pkg/camera"

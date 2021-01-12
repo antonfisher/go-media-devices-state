@@ -15,7 +15,7 @@ go get github.com/antonfisher/go-media-devices-state
 
 ## Demo
 
-Demo prints out all system video devices and their states (On/Off):
+Demo prints out all system video devices and their states (ON/OFF):
 
 ```shell
 git clone https://github.com/antonfisher/go-media-devices-state.git
@@ -26,25 +26,39 @@ go run -a cmd/demo.go
 ## Usage
 
 ```go
-import {
-  "fmt"
+package main
 
-  mediaDevices "github.com/antonfisher/go-media-devices-state"
-}
+import (
+	"fmt"
+
+	mediaDevices "github.com/antonfisher/go-media-devices-state"
+)
 
 func main() {
-  fmt.Println("Camera state:", mediaDevices.IsCameraOn())
-  fmt.Println("Debug (calls every available API):", mediaDevices.Debug())
+	isCameraOn, err := mediaDevices.IsCameraOn()
+	if err != nil {
+		fmt.Println("Error:", err)
+	} else {
+		fmt.Println("Is camera on:", isCameraOn)
+	}
 }
 ```
 
 ## Implemented APIs
 
-| Platform | `IsCameraOn()` | `IsMicOn()` | Details                                |
-|----------|:--------------:|:-----------:|----------------------------------------|
-| darwin   |       ☑        |      ☐      | Using `CoreMediaIO/CMIOHardware.h` API |
-| linux    |       ☐        |      ☐      |                                        |
-| windows  |       ☐        |      ☐      |                                        |
+| Platform | `IsCameraOn()` | `IsMicOn()` | `Debug()` | Details                                |
+|----------|:--------------:|:-----------:|-----------|----------------------------------------|
+| darwin   |       ☑        |      ☐      | ☑         | Using `CoreMediaIO/CMIOHardware.h` API |
+| linux    |       ☐        |      ☐      | ☐         |                                        |
+| windows  |       ☐        |      ☐      | ☐         |                                        |
+
+```go
+// IsCameraOn return true is any camera in the system is ON
+func IsCameraOn() (bool, error)
+
+// Debug calls all available device functions and prints the results
+func Debug()
+```
 
 ## Troubleshooting
 
