@@ -43,7 +43,7 @@ func main() {
 
 ## Implemented APIs
 
-| Platform | `IsCameraOn()` | `isMicrophoneOn()` | `Debug()` | Details                                                               |
+| Platform | `IsCameraOn()` | `IsMicrophoneOn()` | `Debug()` | Details                                                               |
 |----------|:--------------:|:------------------:|-----------|-----------------------------------------------------------------------|
 | darwin   |       ☑        |         ☑          | ☑         | Using `CoreMediaIO/CMIOHardware.h` and `CoreAudio/AudioHardware.h`API |
 | linux    |       ☐        |         ☐          | ☐         |                                                                       |
