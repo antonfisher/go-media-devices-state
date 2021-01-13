@@ -10,26 +10,21 @@ package camera
 import "C"
 import (
 	"fmt"
+
+	"github.com/antonfisher/go-media-devices-state/pkg/common"
 )
 
-//TODO add known codes for CoreMediaIO (?)
-const (
-	errNoErr = iota
-	errOutOfMemory
-	errAllDevicesFailed
-)
-
-// IsCameraOn return true is any camera in the system is ON
+// IsCameraOn returns true is any camera in the system is ON
 func IsCameraOn() (bool, error) {
 	isCameraOn := C.int(0)
 	errCode := C.IsCameraOn(&isCameraOn)
 
-	if errCode != 0 {
+	if errCode != common.ErrNoErr {
 		var msg string
 		switch errCode {
-		case errOutOfMemory:
+		case common.ErrOutOfMemory:
 			msg = "IsCameraOn(): failed to allocate memory"
-		case errAllDevicesFailed:
+		case common.ErrAllDevicesFailed:
 			msg = "IsCameraOn(): all devices failed to provide status"
 		default:
 			msg = fmt.Sprintf("IsCameraOn(): failed with error code: %d", errCode)
@@ -37,5 +32,5 @@ func IsCameraOn() (bool, error) {
 		return false, fmt.Errorf("IsCameraOn(): %s", msg)
 	}
 
-	return isCameraOn != 0, nil
+	return isCameraOn == 1, nil
 }

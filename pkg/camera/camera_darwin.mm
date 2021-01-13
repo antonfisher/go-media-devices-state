@@ -2,9 +2,10 @@
 #import <CoreMediaIO/CMIOHardware.h>
 #import <Foundation/Foundation.h>
 
-const int ERR_NO_ERR = 0;
-const int ERR_OUT_OF_MEMORY = 1;
-const int ERR_ALL_DEVICES_FAILED = 2;
+// TODO how to use single `common/errno.mm` file for both packages?
+const int VD_ERR_NO_ERR = 0;
+const int VD_ERR_OUT_OF_MEMORY = 1;
+const int VD_ERR_ALL_DEVICES_FAILED = 2;
 
 bool isIgnoredDeviceUID(NSString *uid) {
   // OBS virtual device always returns "is used" even when OBS is not running
@@ -144,13 +145,14 @@ OSStatus IsCameraOn(int *on) {
   if (devices == NULL) {
     NSLog(@"C.IsCameraOn(): failed to allocate memory, device count: %d",
           count);
-    return ERR_OUT_OF_MEMORY;
+    return VD_ERR_OUT_OF_MEMORY;
   }
 
   err = getVideoDevices(count, devices);
   if (err) {
     NSLog(@"C.IsCameraOn(): failed to get devices, error: %d", err);
     free(devices);
+    devices = NULL;
     return err;
   }
 
@@ -183,8 +185,7 @@ OSStatus IsCameraOn(int *on) {
     err = getVideoDeviceIsUsed(device, &isDeviceUsed);
     if (err) {
       failedDeviceCount++;
-      NSLog(@"C.IsCameraOn(): %d | -       | failed to get device usage "
-            @"status: %d",
+      NSLog(@"C.IsCameraOn(): %d | -       | failed to get device status: %d",
             i, err);
       continue;
     }
@@ -201,14 +202,15 @@ OSStatus IsCameraOn(int *on) {
   }
 
   free(devices);
+  devices = NULL;
 
   NSLog(@"C.IsCameraOn(): failed devices: %d", failedDeviceCount);
-  NSLog(@"C.IsCameraOn(): ignored devices: %d", ignoredDeviceCount);
+  NSLog(@"C.IsCameraOn(): ignored devices (always on): %d", ignoredDeviceCount);
   NSLog(@"C.IsCameraOn(): is any camera on: %s", *on == 0 ? "NO" : "YES");
 
   if (failedDeviceCount == count) {
-    return ERR_ALL_DEVICES_FAILED;
+    return VD_ERR_ALL_DEVICES_FAILED;
   }
 
-  return ERR_NO_ERR;
+  return VD_ERR_NO_ERR;
 }
