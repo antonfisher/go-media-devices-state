@@ -21,12 +21,12 @@ OSStatus getVideoDevicesCount(int *count) {
 
   CMIOObjectPropertyAddress prop = {kCMIOHardwarePropertyDevices,
                                     kCMIOObjectPropertyScopeGlobal,
-                                    kCMIOObjectPropertyElementMaster};
+                                    kCMIOObjectPropertyElementMain};
 
   err = CMIOObjectGetPropertyDataSize(kCMIOObjectSystemObject, &prop, 0, nil,
                                       &dataSize);
   if (err != kCMIOHardwareNoError) {
-    NSLog(@"getVideoDevicesCount(): error: %d", err);
+    // NSLog(@"getVideoDevicesCount(): error: %d", err);
     return err;
   }
 
@@ -42,19 +42,19 @@ OSStatus getVideoDevices(int count, CMIODeviceID *devices) {
 
   CMIOObjectPropertyAddress prop = {kCMIOHardwarePropertyDevices,
                                     kCMIOObjectPropertyScopeGlobal,
-                                    kCMIOObjectPropertyElementMaster};
+                                    kCMIOObjectPropertyElementMain};
 
   err = CMIOObjectGetPropertyDataSize(kCMIOObjectSystemObject, &prop, 0, nil,
                                       &dataSize);
   if (err != kCMIOHardwareNoError) {
-    NSLog(@"getVideoDevices(): get data size error: %d", err);
+    // NSLog(@"getVideoDevices(): get data size error: %d", err);
     return err;
   }
 
   err = CMIOObjectGetPropertyData(kCMIOObjectSystemObject, &prop, 0, nil,
                                   dataSize, &dataUsed, devices);
   if (err != kCMIOHardwareNoError) {
-    NSLog(@"getVideoDevices(): get data error: %d", err);
+    // NSLog(@"getVideoDevices(): get data error: %d", err);
     return err;
   }
 
@@ -72,7 +72,7 @@ OSStatus getVideoDeviceUID(CMIOObjectID device, NSString **uid) {
 
   err = CMIOObjectGetPropertyDataSize(device, &prop, 0, nil, &dataSize);
   if (err != kCMIOHardwareNoError) {
-    NSLog(@"getVideoDeviceUID(): get data size error: %d", err);
+    // NSLog(@"getVideoDeviceUID(): get data size error: %d", err);
     return err;
   }
 
@@ -80,7 +80,7 @@ OSStatus getVideoDeviceUID(CMIOObjectID device, NSString **uid) {
   err = CMIOObjectGetPropertyData(device, &prop, 0, nil, dataSize, &dataUsed,
                                   &uidStringRef);
   if (err != kCMIOHardwareNoError) {
-    NSLog(@"getVideoDeviceUID(): get data error: %d", err);
+    // NSLog(@"getVideoDeviceUID(): get data error: %d", err);
     return err;
   }
 
@@ -115,14 +115,14 @@ OSStatus getVideoDeviceIsUsed(CMIOObjectID device, int *isUsed) {
 
   err = CMIOObjectGetPropertyDataSize(device, &prop, 0, nil, &dataSize);
   if (err != kCMIOHardwareNoError) {
-    NSLog(@"getVideoDeviceIsUsed(): get data size error: %d", err);
+    // NSLog(@"getVideoDeviceIsUsed(): get data size error: %d", err);
     return err;
   }
 
   err = CMIOObjectGetPropertyData(device, &prop, 0, nil, dataSize, &dataUsed,
                                   isUsed);
   if (err != kCMIOHardwareNoError) {
-    NSLog(@"getVideoDeviceIsUsed(): get data error: %d", err);
+    // NSLog(@"getVideoDeviceIsUsed(): get data error: %d", err);
     return err;
   }
 
@@ -130,35 +130,35 @@ OSStatus getVideoDeviceIsUsed(CMIOObjectID device, int *isUsed) {
 }
 
 OSStatus IsCameraOn(int *on) {
-  NSLog(@"C.IsCameraOn()");
+  // NSLog(@"C.IsCameraOn()");
 
   OSStatus err;
 
   int count;
   err = getVideoDevicesCount(&count);
   if (err) {
-    NSLog(@"C.IsCameraOn(): failed to get devices count, error: %d", err);
+    // NSLog(@"C.IsCameraOn(): failed to get devices count, error: %d", err);
     return err;
   }
 
   CMIODeviceID *devices = (CMIODeviceID *)malloc(count * sizeof(*devices));
   if (devices == NULL) {
-    NSLog(@"C.IsCameraOn(): failed to allocate memory, device count: %d",
-          count);
+    // NSLog(@"C.IsCameraOn(): failed to allocate memory, device count: %d",
+    // count);
     return VD_ERR_OUT_OF_MEMORY;
   }
 
   err = getVideoDevices(count, devices);
   if (err) {
-    NSLog(@"C.IsCameraOn(): failed to get devices, error: %d", err);
+    // NSLog(@"C.IsCameraOn(): failed to get devices, error: %d", err);
     free(devices);
     devices = NULL;
     return err;
   }
 
-  NSLog(@"C.IsCameraOn(): found devices: %d", count);
+  // NSLog(@"C.IsCameraOn(): found devices: %d", count);
   if (count > 0) {
-    NSLog(@"C.IsCameraOn(): # | is used | description");
+    // NSLog(@"C.IsCameraOn(): # | is used | description");
   }
 
   int failedDeviceCount = 0;
@@ -171,8 +171,8 @@ OSStatus IsCameraOn(int *on) {
     err = getVideoDeviceUID(device, &uid);
     if (err) {
       failedDeviceCount++;
-      NSLog(@"C.IsCameraOn(): %d | -       | failed to get device UID: %d", i,
-            err);
+      // NSLog(@"C.IsCameraOn(): %d | -       | failed to get device UID: %d",
+      // i, err);
       continue;
     }
 
@@ -185,16 +185,16 @@ OSStatus IsCameraOn(int *on) {
     err = getVideoDeviceIsUsed(device, &isDeviceUsed);
     if (err) {
       failedDeviceCount++;
-      NSLog(@"C.IsCameraOn(): %d | -       | failed to get device status: %d",
-            i, err);
+      // NSLog(@"C.IsCameraOn(): %d | -       | failed to get device status:
+      // %d", i, err);
       continue;
     }
 
     NSString *description;
     getVideoDeviceDescription(uid, &description);
 
-    NSLog(@"C.IsCameraOn(): %d | %s     | %@", i,
-          isDeviceUsed == 0 ? "NO " : "YES", description);
+    // NSLog(@"C.IsCameraOn(): %d | %s     | %@", i, isDeviceUsed == 0 ? "NO " :
+    // "YES", description);
 
     if (isDeviceUsed != 0) {
       *on = 1;
@@ -204,9 +204,12 @@ OSStatus IsCameraOn(int *on) {
   free(devices);
   devices = NULL;
 
-  NSLog(@"C.IsCameraOn(): failed devices: %d", failedDeviceCount);
-  NSLog(@"C.IsCameraOn(): ignored devices (always on): %d", ignoredDeviceCount);
-  NSLog(@"C.IsCameraOn(): is any camera on: %s", *on == 0 ? "NO" : "YES");
+  /*
+    NSLog(@"C.IsCameraOn(): failed devices: %d", failedDeviceCount);
+    NSLog(@"C.IsCameraOn(): ignored devices (always on): %d",
+    ignoredDeviceCount); NSLog(@"C.IsCameraOn(): is any camera on: %s", *on == 0
+    ? "NO" : "YES");
+    */
 
   if (failedDeviceCount == count) {
     return VD_ERR_ALL_DEVICES_FAILED;
