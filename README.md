@@ -19,7 +19,6 @@ fn main() {
 	println!("Microphone is: {:?}", mic);
 	println!("Camera is: {:?}", cam);
 }
-}
 ```
 
 ## Implemented APIs
