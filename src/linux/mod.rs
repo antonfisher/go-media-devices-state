@@ -18,7 +18,7 @@ pub(crate) mod internal {
                     return Some(State::On);
                 }
             }
-            return Some(State::Off);
+            Some(State::Off)
         }
 
         pub fn cam_state(&self) -> Option<State> {
@@ -27,7 +27,7 @@ pub(crate) mod internal {
                     return Some(State::On);
                 }
             }
-            return Some(State::Off);
+            Some(State::Off)
         }
     }
 }

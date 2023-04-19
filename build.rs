@@ -4,6 +4,7 @@ fn main() {
 }
 
 #[inline]
+#[cfg(target_os = "macos")]
 fn macos_build() {
     let dst = cmake::build("libmediastate");
 
