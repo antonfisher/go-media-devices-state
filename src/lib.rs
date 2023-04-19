@@ -1,3 +1,15 @@
+#[cfg(target_os = "macos")]
+mod osx;
+
+#[cfg(target_os = "macos")]
+use osx::internal;
+
+#[cfg(target_os = "linux")]
+mod linux;
+
+#[cfg(target_os = "linux")]
+use linux::internal;
+
 pub fn microphone_state() -> Option<State> {
     internal::MediaState::new().mic_status()
 }
@@ -13,39 +25,17 @@ pub enum State {
     Off,
 }
 
-mod internal {
-    extern "C" {
-        pub fn IsMicrophoneOn(status: *mut std::ffi::c_int) -> std::ffi::c_int;
-        pub fn IsCameraOn(status: *mut std::ffi::c_int) -> std::ffi::c_int;
-    }
+#[cfg(test)]
+mod test {
+    use crate::{camera_state, microphone_state};
 
-    use crate::State;
-
-    pub struct MediaState;
-
-    impl MediaState {
-        pub fn new() -> Self {
-            Self
-        }
-
-        pub fn mic_status(&self) -> Option<State> {
-            let mut status = 0;
-
-            if unsafe { IsMicrophoneOn(&mut status as _) } != 0 {
-                return None;
-            }
-
-            Some(if status == 0 { State::Off } else { State::On })
-        }
-
-        pub fn cam_state(&self) -> Option<State> {
-            let mut status = 0;
-
-            if unsafe { IsCameraOn(&mut status as _) } != 0 {
-                return None;
-            }
-
-            Some(if status == 0 { State::Off } else { State::On })
-        }
+    // Run any process that uses mic and/or cam and check if the states are accurate
+    #[test]
+    fn test_mic_cam_state() {
+        println!(
+            "Mic status: {:?}\nCam status: {:?}",
+            microphone_state(),
+            camera_state()
+        );
     }
 }
