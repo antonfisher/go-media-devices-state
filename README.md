@@ -7,7 +7,7 @@ Rust module to get camera/microphone state -- checks if camera/microphone is ON.
 ```shell
 git clone https://github.com/SubconsciousCompute/rs-media-devices-state
 cd rs-media-devices-state
-cargo build 
+cargo build
 ```
 
 ## Usage
@@ -24,11 +24,10 @@ fn main() {
 ## Implemented APIs
 
 | Platform | `IsCameraOn()` | `IsMicrophoneOn()` | `Debug()` | Details                                                               |
-|----------|:--------------:|:------------------:|-----------|-----------------------------------------------------------------------|
+| -------- | :------------: | :----------------: | --------- | --------------------------------------------------------------------- |
 | darwin   |       ☑        |         ☑          | ☑         | Using `CoreMediaIO/CMIOHardware.h` and `CoreAudio/AudioHardware.h`API |
-| linux    |       ☐        |         ☐          | ☐         |                                                                       |
+| linux    |       ☑        |         ☑          | ☐         |
 | windows  |       ☐        |         ☐          | ☐         |                                                                       |
-
 
 ## Examples
 
@@ -39,12 +38,14 @@ cargo run --example demo
 ## Troubleshooting
 
 List all registered cameras:
+
 ```shell
 // macOS
 system_profiler SPCameraDataType
 ```
 
 List all registered microphones and speakers:
+
 ```shell
 // macOS
 system_profiler SPAudioDataType
