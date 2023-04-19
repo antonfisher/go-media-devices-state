@@ -1,21 +1,30 @@
 name: Rust
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build:
-
+  build_osx:
     runs-on: macos-latest
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Build
-      run: cargo build --verbose
-    - name: Lints
-      run: cargo clippy -- -Dwarnings
+      - uses: actions/checkout@v3
+      - name: Build
+        run: cargo build --verbose
+      - name: Lints
+        run: cargo clippy -- -Dwarnings
+
+  build_linux:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build
+        run: cargo build --verbose
+      - name: Lints
+        run: cargo clippy -- -Dwarnings
