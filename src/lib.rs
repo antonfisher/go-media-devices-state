@@ -42,25 +42,19 @@ mod test {
     // Run any process that uses mic and/or cam and check if the states are accurate
     #[test]
     fn test_mic_cam_state() {
-        loop {
-            println!(
-                "Mic status: {:?}\nCam status: {:?}\n",
-                microphone_state(),
-                camera_state()
-            );
-            thread::sleep(Duration::from_secs(1));
-        }
+        println!(
+            "Mic status: {:?}\nCam status: {:?}\n",
+            microphone_state(),
+            camera_state()
+        );
     }
 
     #[test]
     fn test_mic_cam_apps() {
-        loop {
-            println!(
-                "Apps using mic: {:?}\nApps using cam: {:?}\n",
-                apps_using_mic(),
-                apps_using_cam()
-            );
-            thread::sleep(Duration::from_secs(1));
-        }
+        println!(
+            "Apps using mic: {:?}\nApps using cam: {:?}\n",
+            apps_using_mic(),
+            apps_using_cam()
+        );
     }
 }

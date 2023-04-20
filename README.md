@@ -31,8 +31,16 @@ fn main() {
 
 ## Examples
 
+Check state of your media device:
+
 ```shell
-cargo run --example demo
+cargo run --example demo-state
+```
+
+Check whcih app is using your media device:
+
+```shell
+cargo run --example demo-state
 ```
 
 ## Troubleshooting
@@ -44,11 +52,21 @@ List all registered cameras:
 system_profiler SPCameraDataType
 ```
 
+```shell
+// linux
+ls /dev | grep video
+```
+
 List all registered microphones and speakers:
 
 ```shell
 // macOS
 system_profiler SPAudioDataType
+```
+
+```shell
+// linux
+ls /dev/snd | grep pcm
 ```
 
 ## License
