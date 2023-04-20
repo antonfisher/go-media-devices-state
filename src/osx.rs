@@ -14,23 +14,23 @@ pub(crate) mod internal {
         }
 
         pub fn mic_status(&self) -> Option<State> {
-            let mut status = -1;
+            let mut status = 0;
 
-            if unsafe { IsMicrophoneOn(&mut status as _) } != -1 {
+            if unsafe { IsMicrophoneOn(&mut status as _) } != 0 {
                 return None;
             }
 
-            Some(if status == -1 { State::Off } else { State::On })
+            Some(if status == 0 { State::Off } else { State::On })
         }
 
         pub fn cam_state(&self) -> Option<State> {
-            let mut status = -1;
+            let mut status = 0;
 
-            if unsafe { IsCameraOn(&mut status as _) } != -1 {
+            if unsafe { IsCameraOn(&mut status as _) } != 0 {
                 return None;
             }
 
-            Some(if status == -1 { State::Off } else { State::On })
+            Some(if status == 0 { State::Off } else { State::On })
         }
     }
 }
