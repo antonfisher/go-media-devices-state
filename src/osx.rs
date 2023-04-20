@@ -23,6 +23,12 @@ pub(crate) mod internal {
             Some(if status == 0 { State::Off } else { State::On })
         }
 
+        pub fn apps_using_mic() -> Vec<String> {
+            // TODO: implement for osx
+            tracing::warn("Not implemented for OSX");
+            vec![]
+        }
+
         pub fn cam_state(&self) -> Option<State> {
             let mut status = 0;
 
@@ -31,6 +37,12 @@ pub(crate) mod internal {
             }
 
             Some(if status == 0 { State::Off } else { State::On })
+        }
+
+        pub fn apps_using_cam() -> Vec<String> {
+            // TODO: implement for osx
+            tracing::warn("Not implemented for OSX");
+            vec![]
         }
     }
 }

@@ -19,6 +19,14 @@ pub fn camera_state() -> Option<State> {
     internal::MediaState::new().cam_state()
 }
 
+pub fn apps_using_mic() -> Vec<String> {
+    internal::MediaState::apps_using_mic()
+}
+
+pub fn apps_using_cam() -> Vec<String> {
+    internal::MediaState::apps_using_cam()
+}
+
 #[derive(Debug)]
 pub enum State {
     On,
@@ -27,15 +35,32 @@ pub enum State {
 
 #[cfg(test)]
 mod test {
-    use crate::{camera_state, microphone_state};
+    use std::{thread, time::Duration};
+
+    use crate::{apps_using_cam, apps_using_mic, camera_state, microphone_state};
 
     // Run any process that uses mic and/or cam and check if the states are accurate
     #[test]
     fn test_mic_cam_state() {
-        println!(
-            "Mic status: {:?}\nCam status: {:?}",
-            microphone_state(),
-            camera_state()
-        );
+        loop {
+            println!(
+                "Mic status: {:?}\nCam status: {:?}\n",
+                microphone_state(),
+                camera_state()
+            );
+            thread::sleep(Duration::from_secs(1));
+        }
+    }
+
+    #[test]
+    fn test_mic_cam_apps() {
+        loop {
+            println!(
+                "Apps using mic: {:?}\nApps using cam: {:?}\n",
+                apps_using_mic(),
+                apps_using_cam()
+            );
+            thread::sleep(Duration::from_secs(1));
+        }
     }
 }
