@@ -35,8 +35,6 @@ pub enum State {
 
 #[cfg(test)]
 mod test {
-    use std::{thread, time::Duration};
-
     use crate::{apps_using_cam, apps_using_mic, camera_state, microphone_state};
 
     // Run any process that uses mic and/or cam and check if the states are accurate
