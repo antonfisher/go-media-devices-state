@@ -37,10 +37,10 @@ Check state of your media device:
 cargo run --example demo-state
 ```
 
-Check whcih app is using your media device:
+Check which app is using your media device:
 
 ```shell
-cargo run --example demo-state
+cargo run --example demo-apps
 ```
 
 ## Troubleshooting
