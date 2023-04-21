@@ -25,7 +25,7 @@ pub(crate) mod internal {
 
         pub fn apps_using_mic() -> Vec<String> {
             // TODO: implement for osx
-            tracing::warn("Not implemented for OSX");
+            tracing::warn!("Not implemented for OSX");
             vec![]
         }
 
@@ -41,7 +41,7 @@ pub(crate) mod internal {
 
         pub fn apps_using_cam() -> Vec<String> {
             // TODO: implement for osx
-            tracing::warn("Not implemented for OSX");
+            tracing::warn!("Not implemented for OSX");
             vec![]
         }
     }
