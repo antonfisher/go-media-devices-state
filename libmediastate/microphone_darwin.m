@@ -1,5 +1,6 @@
 #import <AVFoundation/AVFoundation.h>
 #import <CoreAudio/AudioHardware.h>
+#include <CoreFoundation/CoreFoundation.h>
 #import <Foundation/Foundation.h>
 
 // TODO how to use single `common/errno.mm` file for both packages?
@@ -167,12 +168,14 @@ OSStatus IsMicrophoneOn(int *on) {
       failedDeviceCount++;
       // NSLog(@"C.IsMicrophoneOn(): %d | -       | failed to get device UID:
       // %d", i, err);
-      continue;
+      // continue;
+      goto cleanup;
     }
 
     if (!isAudioCaptureDevice(uid)) {
       ignoredDeviceCount++;
-      continue;
+      // continue;
+      goto cleanup;
     }
 
     int isDeviceUsed;
@@ -181,7 +184,8 @@ OSStatus IsMicrophoneOn(int *on) {
       failedDeviceCount++;
       // NSLog( @"C.IsMicrophoneOn(): %d | -       | failed to get device state:
       // %d", i, err);
-      continue;
+      // continue;
+      goto cleanup;
     }
 
     NSString *description;
@@ -193,6 +197,10 @@ OSStatus IsMicrophoneOn(int *on) {
     if (isDeviceUsed != 0) {
       *on = 1;
     }
+
+  cleanup:
+    CFRelease(uid);
+    continue;
   }
 
   free(devices);
