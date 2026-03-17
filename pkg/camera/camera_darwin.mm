@@ -21,7 +21,7 @@ OSStatus getVideoDevicesCount(int *count) {
 
   CMIOObjectPropertyAddress prop = {kCMIOHardwarePropertyDevices,
                                     kCMIOObjectPropertyScopeGlobal,
-                                    kCMIOObjectPropertyElementMaster};
+                                    kCMIOObjectPropertyElementMain};
 
   err = CMIOObjectGetPropertyDataSize(kCMIOObjectSystemObject, &prop, 0, nil,
                                       &dataSize);
@@ -42,7 +42,7 @@ OSStatus getVideoDevices(int count, CMIODeviceID *devices) {
 
   CMIOObjectPropertyAddress prop = {kCMIOHardwarePropertyDevices,
                                     kCMIOObjectPropertyScopeGlobal,
-                                    kCMIOObjectPropertyElementMaster};
+                                    kCMIOObjectPropertyElementMain};
 
   err = CMIOObjectGetPropertyDataSize(kCMIOObjectSystemObject, &prop, 0, nil,
                                       &dataSize);

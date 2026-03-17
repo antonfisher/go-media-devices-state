@@ -13,7 +13,7 @@ OSStatus getAudioDevicesCount(int *count) {
 
   AudioObjectPropertyAddress prop = {kAudioHardwarePropertyDevices,
                                      kAudioObjectPropertyScopeGlobal,
-                                     kAudioObjectPropertyElementMaster};
+                                     kAudioObjectPropertyElementMain};
 
   err = AudioObjectGetPropertyDataSize(kAudioObjectSystemObject, &prop, 0, nil,
                                        &dataSize);
@@ -33,7 +33,7 @@ OSStatus getAudioDevices(int count, AudioDeviceID *devices) {
 
   AudioObjectPropertyAddress prop = {kAudioHardwarePropertyDevices,
                                      kAudioObjectPropertyScopeGlobal,
-                                     kAudioObjectPropertyElementMaster};
+                                     kAudioObjectPropertyElementMain};
 
   err = AudioObjectGetPropertyDataSize(kAudioObjectSystemObject, &prop, 0, nil,
                                        &dataSize);
@@ -58,7 +58,7 @@ OSStatus getAudioDeviceUID(AudioDeviceID device, NSString **uid) {
 
   AudioObjectPropertyAddress prop = {kAudioDevicePropertyDeviceUID,
                                      kAudioObjectPropertyScopeGlobal,
-                                     kAudioObjectPropertyElementMaster};
+                                     kAudioObjectPropertyElementMain};
 
   err = AudioObjectGetPropertyDataSize(device, &prop, 0, nil, &dataSize);
   if (err != kAudioHardwareNoError) {
@@ -105,7 +105,7 @@ OSStatus getAudioDeviceIsUsed(AudioDeviceID device, int *isUsed) {
 
   AudioObjectPropertyAddress prop = {
       kAudioDevicePropertyDeviceIsRunningSomewhere,
-      kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster};
+      kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMain};
 
   err = AudioObjectGetPropertyDataSize(device, &prop, 0, nil, &dataSize);
   if (err != kAudioHardwareNoError) {
