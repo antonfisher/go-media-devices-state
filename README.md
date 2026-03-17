@@ -3,9 +3,11 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/antonfisher/go-media-devices-state)](https://goreportcard.com/report/github.com/antonfisher/go-media-devices-state)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
 
-Go module to get camera/microphone state -- checks if camera/microphone is ON.
+A Go module to get camera and microphone state -- checks if the camera or
+microphone is ON.
 
-Module uses `cgo` to call native specific API on different platforms (currently only darwin is implemented.)
+The module uses `cgo` to call platform-specific native APIs (currently, only
+Darwin is supported).
 
 ## Installation
 
@@ -43,26 +45,26 @@ func main() {
 
 ## Implemented APIs
 
-| Platform | `IsCameraOn()` | `IsMicrophoneOn()` | `Debug()` | Details                                                               |
-|----------|:--------------:|:------------------:|-----------|-----------------------------------------------------------------------|
-| darwin   |       ☑        |         ☑          | ☑         | Using `CoreMediaIO/CMIOHardware.h` and `CoreAudio/AudioHardware.h`API |
-| linux    |       ☐        |         ☐          | ☐         |                                                                       |
-| windows  |       ☐        |         ☐          | ☐         |                                                                       |
+| Platform | `IsCameraOn()` | `IsMicrophoneOn()` | `Debug()` | Details                                                             |
+|----------|:--------------:|:------------------:|-----------|---------------------------------------------------------------------|
+| darwin   |       ☑        |         ☑          | ☑         | Uses `CoreMediaIO/CMIOHardware.h`, `CoreAudio/AudioHardware.h` APIs |
+| linux    |       ☐        |         ☐          | ☐         |                                                                     |
+| windows  |       ☐        |         ☐          | ☐         |                                                                     |
 
 ```go
-// IsCameraOn returns true is any camera in the system is ON
+// IsCameraOn returns `true` if any camera in the system is ON.
 func IsCameraOn() (bool, error)
 
-// IsMicrophoneOn returns true is any microphone in the system is ON
+// IsMicrophoneOn returns `true` if any microphone in the system is ON.
 func IsMicrophoneOn() (bool, error)
 
-// Debug calls all available device functions and prints the results
+// Debug calls all available device functions and prints the results.
 func Debug()
 ```
 
 ## Demo
 
-Demo prints out all system video devices and their states (ON/OFF):
+The demo prints all system video devices and their states (ON/OFF):
 
 ```shell
 git clone https://github.com/antonfisher/go-media-devices-state.git
