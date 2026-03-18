@@ -1,11 +1,5 @@
-#import <AVFoundation/AVFoundation.h>
 #import <CoreAudio/AudioHardware.h>
-#import <Foundation/Foundation.h>
-
-// TODO how to use single `common/errno.mm` file for both packages?
-const int AD_ERR_NO_ERR = 0;
-const int AD_ERR_OUT_OF_MEMORY = 1;
-const int AD_ERR_ALL_DEVICES_FAILED = 2;
+#import "../common/common_darwin.h"
 
 OSStatus getAudioDevicesCount(int *count) {
   OSStatus err;
@@ -84,21 +78,6 @@ bool isAudioCaptureDevice(NSString *uid) {
   return avDevice != nil;
 }
 
-void getAudioDeviceDescription(NSString *uid, NSString **description) {
-  AVCaptureDevice *avDevice = [AVCaptureDevice deviceWithUniqueID:uid];
-  if (avDevice == nil) {
-    *description = [NSString
-        stringWithFormat:@"%@ (failed to get AVCaptureDevice with device UID)",
-                         uid];
-  } else {
-    *description =
-        [NSString stringWithFormat:
-                      @"%@ (name: '%@', model: '%@', is exclusively used: %d)",
-                      uid, [avDevice localizedName], [avDevice modelID],
-                      [avDevice isInUseByAnotherApplication]];
-  }
-}
-
 OSStatus getAudioDeviceIsUsed(AudioDeviceID device, int *isUsed) {
   OSStatus err;
   UInt32 dataSize = 0;
@@ -138,7 +117,7 @@ OSStatus IsMicrophoneOn(int *on) {
   if (devices == NULL) {
     NSLog(@"C.IsMicrophoneOn(): failed to allocate memory, device count: %d",
           count);
-    return AD_ERR_OUT_OF_MEMORY;
+    return ERR_OUT_OF_MEMORY;
   }
 
   err = getAudioDevices(count, devices);
@@ -185,7 +164,7 @@ OSStatus IsMicrophoneOn(int *on) {
     }
 
     NSString *description;
-    getAudioDeviceDescription(uid, &description);
+    getDeviceDescription(uid, &description);
 
     NSLog(@"C.IsMicrophoneOn(): %d | %s     | %@", i,
           isDeviceUsed == 0 ? "NO " : "YES", description);
@@ -205,8 +184,8 @@ OSStatus IsMicrophoneOn(int *on) {
         *on == 0 ? "NO" : "YES");
 
   if (failedDeviceCount == count) {
-    return AD_ERR_ALL_DEVICES_FAILED;
+    return ERR_ALL_DEVICES_FAILED;
   }
 
-  return AD_ERR_NO_ERR;
+  return ERR_NO_ERR;
 }

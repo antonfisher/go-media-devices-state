@@ -1,4 +1,6 @@
-.PHONY: all build run lint clean help
+.PHONY: all run lint help
+
+all: run
 
 run:
 	@echo "Running demo..."

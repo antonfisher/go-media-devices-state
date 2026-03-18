@@ -1,11 +1,5 @@
-#import <AVFoundation/AVFoundation.h>
 #import <CoreMediaIO/CMIOHardware.h>
-#import <Foundation/Foundation.h>
-
-// TODO how to use single `common/errno.mm` file for both packages?
-const int VD_ERR_NO_ERR = 0;
-const int VD_ERR_OUT_OF_MEMORY = 1;
-const int VD_ERR_ALL_DEVICES_FAILED = 2;
+#import "../common/common_darwin.h"
 
 bool isIgnoredDeviceUID(NSString *uid) {
   // OBS virtual device always returns "is used" even when OBS is not running
@@ -89,21 +83,6 @@ OSStatus getVideoDeviceUID(CMIOObjectID device, NSString **uid) {
   return err;
 }
 
-void getVideoDeviceDescription(NSString *uid, NSString **description) {
-  AVCaptureDevice *avDevice = [AVCaptureDevice deviceWithUniqueID:uid];
-  if (avDevice == nil) {
-    *description = [NSString
-        stringWithFormat:@"%@ (failed to get AVCaptureDevice with device UID)",
-                         uid];
-  } else {
-    *description =
-        [NSString stringWithFormat:
-                      @"%@ (name: '%@', model: '%@', is exclusively used: %d)",
-                      uid, [avDevice localizedName], [avDevice modelID],
-                      [avDevice isInUseByAnotherApplication]];
-  }
-}
-
 OSStatus getVideoDeviceIsUsed(CMIOObjectID device, int *isUsed) {
   OSStatus err;
   UInt32 dataSize = 0;
@@ -145,7 +124,7 @@ OSStatus IsCameraOn(int *on) {
   if (devices == NULL) {
     NSLog(@"C.IsCameraOn(): failed to allocate memory, device count: %d",
           count);
-    return VD_ERR_OUT_OF_MEMORY;
+    return ERR_OUT_OF_MEMORY;
   }
 
   err = getVideoDevices(count, devices);
@@ -191,7 +170,7 @@ OSStatus IsCameraOn(int *on) {
     }
 
     NSString *description;
-    getVideoDeviceDescription(uid, &description);
+    getDeviceDescription(uid, &description);
 
     NSLog(@"C.IsCameraOn(): %d | %s     | %@", i,
           isDeviceUsed == 0 ? "NO " : "YES", description);
@@ -209,8 +188,8 @@ OSStatus IsCameraOn(int *on) {
   NSLog(@"C.IsCameraOn(): is any camera on: %s", *on == 0 ? "NO" : "YES");
 
   if (failedDeviceCount == count) {
-    return VD_ERR_ALL_DEVICES_FAILED;
+    return ERR_ALL_DEVICES_FAILED;
   }
 
-  return VD_ERR_NO_ERR;
+  return ERR_NO_ERR;
 }
