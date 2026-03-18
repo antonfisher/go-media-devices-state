@@ -189,7 +189,7 @@ OSStatus IsMicrophoneOn(int *on) {
   DEBUG_LOG(@"C.IsMicrophoneOn(): is any microphone on: %s",
         *on == 0 ? "NO" : "YES");
 
-  if (failedDeviceCount == count) {
+  if (failedDeviceCount == count && count > 0) {
     return ERR_ALL_DEVICES_FAILED;
   }
 
