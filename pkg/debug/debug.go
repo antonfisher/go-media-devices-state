@@ -19,6 +19,7 @@ func Debug() {
 	fmt.Println("Debug go-media-devices-state module...")
 	fmt.Println()
 
+	camera.EnableLogging(true)
 	isCameraOn, err := camera.IsCameraOn()
 	fmt.Println()
 	if err != nil {
@@ -29,6 +30,7 @@ func Debug() {
 
 	fmt.Println()
 
+	microphone.EnableLogging(true)
 	isMicrophoneOn, err := microphone.IsMicrophoneOn()
 	fmt.Println()
 	if err != nil {

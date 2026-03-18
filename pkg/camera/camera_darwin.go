@@ -14,6 +14,15 @@ import (
 	"github.com/antonfisher/go-media-devices-state/pkg/common"
 )
 
+// EnableLogging enables or disables debug logging in the C implementation
+func EnableLogging(enabled bool) {
+	if enabled {
+		C.CameraSetDebug(C.int(1))
+	} else {
+		C.CameraSetDebug(C.int(0))
+	}
+}
+
 // IsCameraOn returns true is any camera in the system is ON
 func IsCameraOn() (bool, error) {
 	isCameraOn := C.int(0)

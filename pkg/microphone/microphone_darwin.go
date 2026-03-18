@@ -14,6 +14,15 @@ import (
 	"github.com/antonfisher/go-media-devices-state/pkg/common"
 )
 
+// EnableLogging enables or disables debug logging in the C implementation
+func EnableLogging(enabled bool) {
+	if enabled {
+		C.MicrophoneSetDebug(C.int(1))
+	} else {
+		C.MicrophoneSetDebug(C.int(0))
+	}
+}
+
 // IsMicrophoneOn returns true is any microphone in the system is ON
 func IsMicrophoneOn() (bool, error) {
 	isMicrophoneOn := C.int(0)

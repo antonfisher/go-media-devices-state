@@ -45,11 +45,11 @@ func main() {
 
 ## Implemented APIs
 
-| Platform | `IsCameraOn()` | `IsMicrophoneOn()` | `Debug()` | Details                                                             |
-|----------|:--------------:|:------------------:|-----------|---------------------------------------------------------------------|
-| darwin   |       ☑        |         ☑          | ☑         | Uses `CoreMediaIO/CMIOHardware.h`, `CoreAudio/AudioHardware.h` APIs |
-| linux    |       ☐        |         ☐          | ☐         |                                                                     |
-| windows  |       ☐        |         ☐          | ☐         |                                                                     |
+| Platform | `IsCameraOn()` | `IsMicrophoneOn()` | `Debug()` | `EnableLogging()` | Details                                                             |
+|----------|:--------------:|:------------------:|:---------:|:-----------------:|---------------------------------------------------------------------|
+| darwin   |       ☑        |         ☑          |     ☑     |        ☑          | Uses `CoreMediaIO/CMIOHardware.h`, `CoreAudio/AudioHardware.h` APIs |
+| linux    |       ☐        |         ☐          |     ☐     |        ☐          |                                                                     |
+| windows  |       ☐        |         ☐          |     ☐     |        ☐          |                                                                     |
 
 ```go
 // IsCameraOn returns `true` if any camera in the system is ON.
@@ -57,6 +57,9 @@ func IsCameraOn() (bool, error)
 
 // IsMicrophoneOn returns `true` if any microphone in the system is ON.
 func IsMicrophoneOn() (bool, error)
+
+// EnableLogging enables or disables internal debug logging.
+func EnableLogging(enabled bool)
 
 // Debug calls all available device functions and prints the results.
 func Debug()
