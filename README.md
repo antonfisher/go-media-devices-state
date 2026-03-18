@@ -45,11 +45,14 @@ func main() {
 
 ## Implemented APIs
 
-| Platform | `IsCameraOn()` | `IsMicrophoneOn()` | `Debug()` | `EnableLogging()` | Details                                                             |
-|----------|:--------------:|:------------------:|:---------:|:-----------------:|---------------------------------------------------------------------|
-| darwin   |       ☑        |         ☑          |     ☑     |        ☑          | Uses `CoreMediaIO/CMIOHardware.h`, `CoreAudio/AudioHardware.h` APIs |
-| linux    |       ☐        |         ☐          |     ☐     |        ☐          |                                                                     |
-| windows  |       ☐        |         ☐          |     ☐     |        ☐          |                                                                     |
+| API | darwin | linux | windows |
+|:---|:---:|:---:|:---:|
+| `IsCameraOn()` | ☑ | ☐ | ☐ |
+| `IsMicrophoneOn()` | ☑ | ☐ | ☐ |
+| `EnableLogging()` | ☑ | ☐ | ☐ |
+| `Debug()` | ☑ | ☐ | ☐ |
+
+*darwin details: Uses `CoreMediaIO/CMIOHardware.h`, `CoreAudio/AudioHardware.h` APIs*
 
 ```go
 // IsCameraOn returns `true` if any camera in the system is ON.
