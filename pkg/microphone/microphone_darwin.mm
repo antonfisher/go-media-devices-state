@@ -72,7 +72,12 @@ OSStatus getAudioDeviceUID(AudioDeviceID device, NSString **uid) {
     return err;
   }
 
-  *uid = (NSString *)uidStringRef;
+  if (uidStringRef != NULL) {
+    *uid = [((NSString *)uidStringRef) copy];
+    CFRelease(uidStringRef);
+  } else {
+    *uid = nil;
+  }
 
   return err;
 }
@@ -144,7 +149,7 @@ OSStatus IsMicrophoneOn(int *on) {
     @autoreleasepool {
       AudioDeviceID device = devices[i];
 
-      NSString *uid;
+      NSString *uid = nil;
       err = getAudioDeviceUID(device, &uid);
       if (err) {
         failedDeviceCount++;
@@ -153,8 +158,9 @@ OSStatus IsMicrophoneOn(int *on) {
         continue;
       }
 
-      if (!isAudioCaptureDevice(uid)) {
+      if (uid == nil || !isAudioCaptureDevice(uid)) {
         ignoredDeviceCount++;
+        [uid release];
         continue;
       }
 
@@ -165,6 +171,7 @@ OSStatus IsMicrophoneOn(int *on) {
         DEBUG_LOG(
             @"C.IsMicrophoneOn(): %d | -       | failed to get device state: %d",
             i, (int)err);
+        [uid release];
         continue;
       }
 
@@ -177,6 +184,7 @@ OSStatus IsMicrophoneOn(int *on) {
       if (isDeviceUsed != 0) {
         *on = 1;
       }
+      [uid release];
     }
   }
 

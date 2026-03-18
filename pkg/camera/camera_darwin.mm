@@ -82,7 +82,12 @@ OSStatus getVideoDeviceUID(CMIOObjectID device, NSString **uid) {
     return err;
   }
 
-  *uid = (NSString *)uidStringRef;
+  if (uidStringRef != NULL) {
+    *uid = [((NSString *)uidStringRef) copy];
+    CFRelease(uidStringRef);
+  } else {
+    *uid = nil;
+  }
 
   return err;
 }
@@ -151,7 +156,7 @@ OSStatus IsCameraOn(int *on) {
     @autoreleasepool {
       CMIOObjectID device = devices[i];
 
-      NSString *uid;
+      NSString *uid = nil;
       err = getVideoDeviceUID(device, &uid);
       if (err) {
         failedDeviceCount++;
@@ -160,8 +165,9 @@ OSStatus IsCameraOn(int *on) {
         continue;
       }
 
-      if (isIgnoredDeviceUID(uid)) {
+      if (uid == nil || isIgnoredDeviceUID(uid)) {
         ignoredDeviceCount++;
+        [uid release];
         continue;
       }
 
@@ -171,6 +177,7 @@ OSStatus IsCameraOn(int *on) {
         failedDeviceCount++;
         DEBUG_LOG(@"C.IsCameraOn(): %d | -       | failed to get device status: %d",
               i, (int)err);
+        [uid release];
         continue;
       }
 
@@ -183,6 +190,7 @@ OSStatus IsCameraOn(int *on) {
       if (isDeviceUsed != 0) {
         *on = 1;
       }
+      [uid release];
     }
   }
 
