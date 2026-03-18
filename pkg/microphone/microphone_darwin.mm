@@ -141,40 +141,42 @@ OSStatus IsMicrophoneOn(int *on) {
   int ignoredDeviceCount = 0;
 
   for (int i = 0; i < count; i++) {
-    AudioDeviceID device = devices[i];
+    @autoreleasepool {
+      AudioDeviceID device = devices[i];
 
-    NSString *uid;
-    err = getAudioDeviceUID(device, &uid);
-    if (err) {
-      failedDeviceCount++;
-      DEBUG_LOG(@"C.IsMicrophoneOn(): %d | -       | failed to get device UID: %d",
+      NSString *uid;
+      err = getAudioDeviceUID(device, &uid);
+      if (err) {
+        failedDeviceCount++;
+        DEBUG_LOG(@"C.IsMicrophoneOn(): %d | -       | failed to get device UID: %d",
+              i, (int)err);
+        continue;
+      }
+
+      if (!isAudioCaptureDevice(uid)) {
+        ignoredDeviceCount++;
+        continue;
+      }
+
+      int isDeviceUsed;
+      err = getAudioDeviceIsUsed(device, &isDeviceUsed);
+      if (err) {
+        failedDeviceCount++;
+        DEBUG_LOG(
+            @"C.IsMicrophoneOn(): %d | -       | failed to get device state: %d",
             i, (int)err);
-      continue;
-    }
+        continue;
+      }
 
-    if (!isAudioCaptureDevice(uid)) {
-      ignoredDeviceCount++;
-      continue;
-    }
+      NSString *description;
+      getDeviceDescription(uid, &description);
 
-    int isDeviceUsed;
-    err = getAudioDeviceIsUsed(device, &isDeviceUsed);
-    if (err) {
-      failedDeviceCount++;
-      DEBUG_LOG(
-          @"C.IsMicrophoneOn(): %d | -       | failed to get device state: %d",
-          i, (int)err);
-      continue;
-    }
+      DEBUG_LOG(@"C.IsMicrophoneOn(): %d | %s     | %@", i,
+            isDeviceUsed == 0 ? "NO " : "YES", description);
 
-    NSString *description;
-    getDeviceDescription(uid, &description);
-
-    DEBUG_LOG(@"C.IsMicrophoneOn(): %d | %s     | %@", i,
-          isDeviceUsed == 0 ? "NO " : "YES", description);
-
-    if (isDeviceUsed != 0) {
-      *on = 1;
+      if (isDeviceUsed != 0) {
+        *on = 1;
+      }
     }
   }
 

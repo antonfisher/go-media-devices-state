@@ -148,39 +148,41 @@ OSStatus IsCameraOn(int *on) {
   int ignoredDeviceCount = 0;
 
   for (int i = 0; i < count; i++) {
-    CMIOObjectID device = devices[i];
+    @autoreleasepool {
+      CMIOObjectID device = devices[i];
 
-    NSString *uid;
-    err = getVideoDeviceUID(device, &uid);
-    if (err) {
-      failedDeviceCount++;
-      DEBUG_LOG(@"C.IsCameraOn(): %d | -       | failed to get device UID: %d", i,
-            (int)err);
-      continue;
-    }
+      NSString *uid;
+      err = getVideoDeviceUID(device, &uid);
+      if (err) {
+        failedDeviceCount++;
+        DEBUG_LOG(@"C.IsCameraOn(): %d | -       | failed to get device UID: %d", i,
+              (int)err);
+        continue;
+      }
 
-    if (isIgnoredDeviceUID(uid)) {
-      ignoredDeviceCount++;
-      continue;
-    }
+      if (isIgnoredDeviceUID(uid)) {
+        ignoredDeviceCount++;
+        continue;
+      }
 
-    int isDeviceUsed;
-    err = getVideoDeviceIsUsed(device, &isDeviceUsed);
-    if (err) {
-      failedDeviceCount++;
-      DEBUG_LOG(@"C.IsCameraOn(): %d | -       | failed to get device status: %d",
-            i, (int)err);
-      continue;
-    }
+      int isDeviceUsed;
+      err = getVideoDeviceIsUsed(device, &isDeviceUsed);
+      if (err) {
+        failedDeviceCount++;
+        DEBUG_LOG(@"C.IsCameraOn(): %d | -       | failed to get device status: %d",
+              i, (int)err);
+        continue;
+      }
 
-    NSString *description;
-    getDeviceDescription(uid, &description);
+      NSString *description;
+      getDeviceDescription(uid, &description);
 
-    DEBUG_LOG(@"C.IsCameraOn(): %d | %s     | %@", i,
-          isDeviceUsed == 0 ? "NO " : "YES", description);
+      DEBUG_LOG(@"C.IsCameraOn(): %d | %s     | %@", i,
+            isDeviceUsed == 0 ? "NO " : "YES", description);
 
-    if (isDeviceUsed != 0) {
-      *on = 1;
+      if (isDeviceUsed != 0) {
+        *on = 1;
+      }
     }
   }
 
