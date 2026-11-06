@@ -207,3 +207,103 @@ OSStatus IsCameraOn(int *on) {
 
   return ERR_NO_ERR;
 }
+
+// ---------------------------------------------------------------------------
+// Event-driven API: OS-level property listeners (no polling).
+// ---------------------------------------------------------------------------
+
+// Go-side callback, exported from listen_darwin.go.
+extern void goCameraStateChanged(int isOn);
+
+// Whether the aggregated state was ON at last notification, used to only
+// invoke the Go callback on actual changes.
+static int cameraLastNotifiedState = -1;
+
+// Recompute "is any camera running somewhere" and notify Go on change.
+static void cameraNotifyIfChanged() {
+  int on = 0;
+  if (IsCameraOn(&on) != ERR_NO_ERR) {
+    return;
+  }
+  if (on != cameraLastNotifiedState) {
+    cameraLastNotifiedState = on;
+    goCameraStateChanged(on);
+  }
+}
+
+// Block-based property listeners: dispatched on a dedicated serial GCD
+// queue, so no run loop is required on the calling thread (a Go program
+// never runs the main run loop, which the main queue depends on).
+static dispatch_queue_t mediaDevicesListenerQueue(void) {
+  static dispatch_queue_t queue = NULL;
+  static dispatch_once_t onceToken;
+  dispatch_once(&onceToken, ^{
+    queue = dispatch_queue_create("media-devices-state.camera.listener",
+                                  DISPATCH_QUEUE_SERIAL);
+  });
+  return queue;
+}
+
+static void cameraRegisterDeviceListeners(void);
+
+static CMIOObjectPropertyListenerBlock cameraDeviceListenerBlock =
+    ^(UInt32 numberAddresses, const CMIOObjectPropertyAddress addresses[]) {
+      cameraNotifyIfChanged();
+    };
+
+static CMIOObjectPropertyListenerBlock cameraDevicesChangedBlock =
+    ^(UInt32 numberAddresses, const CMIOObjectPropertyAddress addresses[]) {
+      // Device list changed (camera plugged/unplugged): re-register
+      // per-device listeners and re-evaluate the state.
+      cameraRegisterDeviceListeners();
+      cameraNotifyIfChanged();
+    };
+
+static void cameraRegisterDeviceListeners(void) {
+  int count = 0;
+  if (getVideoDevicesCount(&count) != kCMIOHardwareNoError || count == 0) {
+    return;
+  }
+
+  CMIODeviceID *devices = (CMIODeviceID *)malloc(count * sizeof(*devices));
+  if (devices == NULL) {
+    return;
+  }
+  if (getVideoDevices(count, devices) != kCMIOHardwareNoError) {
+    free(devices);
+    return;
+  }
+
+  CMIOObjectPropertyAddress runningProp = {kCMIODevicePropertyDeviceIsRunningSomewhere,
+                                           kCMIOObjectPropertyScopeWildcard,
+                                           kCMIOObjectPropertyElementWildcard};
+  for (int i = 0; i < count; i++) {
+    CMIOObjectAddPropertyListenerBlock(devices[i], &runningProp,
+                                       mediaDevicesListenerQueue(),
+                                       cameraDeviceListenerBlock);
+  }
+
+  free(devices);
+}
+
+int StartCameraListener(void) {
+  cameraLastNotifiedState = -1;
+
+  // Listen for device list changes on the system object.
+  CMIOObjectPropertyAddress devicesProp = {kCMIOHardwarePropertyDevices,
+                                           kCMIOObjectPropertyScopeGlobal,
+                                           kCMIOObjectPropertyElementMain};
+  OSStatus err = CMIOObjectAddPropertyListenerBlock(kCMIOObjectSystemObject, &devicesProp,
+                                                    mediaDevicesListenerQueue(),
+                                                    cameraDevicesChangedBlock);
+  if (err != kCMIOHardwareNoError) {
+    DEBUG_LOG(@"StartCameraListener(): failed to add devices listener: %d", (int)err);
+    return (int)err;
+  }
+
+  cameraRegisterDeviceListeners();
+
+  // Emit the initial state.
+  cameraNotifyIfChanged();
+  return 0;
+}
