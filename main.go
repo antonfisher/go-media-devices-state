@@ -26,3 +26,19 @@ func IsMicrophoneOn() (bool, error) {
 func Debug() {
 	debug.Debug()
 }
+
+// StartCameraListener registers OS-level CoreMediaIO property listeners and
+// invokes onChange every time the aggregated camera state changes. The
+// callback is invoked immediately with the current state, then on every
+// subsequent change. No polling is involved.
+func StartCameraListener(onChange func(isOn bool)) error {
+	return camera.StartCameraListener(onChange)
+}
+
+// StartMicrophoneListener registers OS-level CoreAudio property listeners and
+// invokes onChange every time the aggregated microphone state changes. The
+// callback is invoked immediately with the current state, then on every
+// subsequent change. No polling is involved.
+func StartMicrophoneListener(onChange func(isOn bool)) error {
+	return microphone.StartMicrophoneListener(onChange)
+}

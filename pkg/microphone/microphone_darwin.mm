@@ -203,3 +203,113 @@ OSStatus IsMicrophoneOn(int *on) {
 
   return ERR_NO_ERR;
 }
+
+// ---------------------------------------------------------------------------
+// Event-driven API: OS-level property listeners (no polling).
+// ---------------------------------------------------------------------------
+
+// Go-side callback, exported from listen_darwin.go.
+extern void goMicrophoneStateChanged(int isOn);
+
+// Whether the aggregated state was ON at last notification, used to only
+// invoke the Go callback on actual changes.
+static int microphoneLastNotifiedState = -1;
+
+// Recompute "is any capture device running somewhere" and notify Go on change.
+static void microphoneNotifyIfChanged() {
+  int on = 0;
+  if (IsMicrophoneOn(&on) != ERR_NO_ERR) {
+    return;
+  }
+  if (on != microphoneLastNotifiedState) {
+    microphoneLastNotifiedState = on;
+    goMicrophoneStateChanged(on);
+  }
+}
+
+// Block-based property listeners: dispatched on a dedicated serial GCD
+// queue, so no run loop is required on the calling thread (a Go program
+// never runs the main run loop, which the main queue depends on).
+static dispatch_queue_t mediaDevicesListenerQueue(void) {
+  static dispatch_queue_t queue = NULL;
+  static dispatch_once_t onceToken;
+  dispatch_once(&onceToken, ^{
+    queue = dispatch_queue_create("media-devices-state.microphone.listener",
+                                  DISPATCH_QUEUE_SERIAL);
+  });
+  return queue;
+}
+
+static AudioObjectPropertyListenerBlock microphoneListenerBlock =
+    ^(UInt32 numberAddresses, const AudioObjectPropertyAddress addresses[]) {
+      microphoneNotifyIfChanged();
+    };
+
+static AudioObjectPropertyListenerBlock microphoneDevicesChangedBlock =
+    ^(UInt32 numberAddresses, const AudioObjectPropertyAddress addresses[]) {
+      extern void MicrophoneRegisterDeviceListeners(void);
+      MicrophoneRegisterDeviceListeners();
+      microphoneNotifyIfChanged();
+    };
+
+void MicrophoneRegisterDeviceListeners(void) {
+  int count = 0;
+  if (getAudioDevicesCount(&count) != kAudioHardwareNoError || count == 0) {
+    return;
+  }
+
+  AudioDeviceID *devices = (AudioDeviceID *)malloc(count * sizeof(*devices));
+  if (devices == NULL) {
+    return;
+  }
+  if (getAudioDevices(count, devices) != kAudioHardwareNoError) {
+    free(devices);
+    return;
+  }
+
+  AudioObjectPropertyAddress runningProp = {
+      kAudioDevicePropertyDeviceIsRunningSomewhere,
+      kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMain};
+
+  for (int i = 0; i < count; i++) {
+    @autoreleasepool {
+      NSString *uid = nil;
+      if (getAudioDeviceUID(devices[i], &uid) != kAudioHardwareNoError || uid == nil) {
+        continue;
+      }
+      // Only capture devices matter for the microphone state.
+      if (!isAudioCaptureDevice(uid)) {
+        [uid release];
+        continue;
+      }
+      [uid release];
+      AudioObjectAddPropertyListenerBlock(devices[i], &runningProp,
+                                          mediaDevicesListenerQueue(),
+                                          microphoneListenerBlock);
+    }
+  }
+
+  free(devices);
+}
+
+int StartMicrophoneListener(void) {
+  microphoneLastNotifiedState = -1;
+
+  // Listen for device list changes on the system object.
+  AudioObjectPropertyAddress devicesProp = {kAudioHardwarePropertyDevices,
+                                            kAudioObjectPropertyScopeGlobal,
+                                            kAudioObjectPropertyElementMain};
+  OSStatus err = AudioObjectAddPropertyListenerBlock(
+      kAudioObjectSystemObject, &devicesProp, mediaDevicesListenerQueue(),
+      microphoneDevicesChangedBlock);
+  if (err != kAudioHardwareNoError) {
+    DEBUG_LOG(@"StartMicrophoneListener(): failed to add devices listener: %d", (int)err);
+    return (int)err;
+  }
+
+  MicrophoneRegisterDeviceListeners();
+
+  // Emit the initial state.
+  microphoneNotifyIfChanged();
+  return 0;
+}
